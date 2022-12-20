@@ -37,6 +37,75 @@ short name[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 short letterPos = 0;
 const byte buzzerPin = 5;
 
+//Joystick Controller
+//Joystick pins
+const int xPin = A0;
+const int yPin = A1;
+const int pinSw = 2;
+
+const int minThreshold = 200;
+const int maxThreshold = 600;
+int xValue = 0;
+int yValue = 0;
+bool swState = HIGH;
+
+//debounce for joystick
+long lastTime = 0;
+long lastJoyTime = 0;
+int interval = 50;
+byte reading = LOW;
+byte joyState = LOW;
+byte lastReading = LOW;
+byte joyReading = LOW;
+byte lastJoyReading = HIGH;
+bool joyMoved = false;
+
+//matrix controller
+const int dinPin = 12;
+const int clockPin = 11;
+const int loadPin = 10;
+
+LedControl lc = LedControl(dinPin, clockPin, loadPin, 1);  // DIN, CLK, LOAD, No. DRIVER
+
+byte xPos = 0;
+byte yPos = 0;
+byte xLastPos = 0;
+byte yLastPos = 0;
+
+
+const byte matrixSize = 8;
+bool matrixChanged = true;
+
+byte matrix[matrixSize][matrixSize] = {
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0 }
+};
+
+//LCD pins
+const byte RS = 9;
+const byte enable = 8;
+const byte d4 = 7;
+const byte d5 = 6;
+const byte d6 = A5;
+const byte d7 = 4;
+const byte brightnessPin = 3;
+
+LiquidCrystal lcd(RS, enable, d4, d5, d6, d7);
+
+
+byte lcdCols = 16;
+byte lcdRows = 2;
+int maxBrightnessValue = 5;
+int minBrightnessValue = 1;
+int maxBrightnessValueRaw = 255;
+int minBrightnessValueRaw = 0;
+
 byte arrowUp[8] = {
   0b00000,
   0b00000,
@@ -115,6 +184,33 @@ short difficulty3;
 short difficulty4;
 short difficulty5;
 
+long int startedFlash = 0;
+short intervalBlink = 500;
+bool isPrinted = false;
+String charToPrint = "_";
+
+bool firstPlace = false;
+bool secondPlace = false;
+bool thirdPlace = false;
+bool fourthPlace = false;
+bool fifthPlace = false;
+bool inGameOver2 = false;
+
+long lastMoved;
+int moveInterval = 100;
+int rx = 3;
+int ry = 3;
+const short hardTime = 8;
+const short mediumTime = 10;
+const short easyTime = 12;
+long lastBlink = 0;
+int blinkTime = 200;
+bool isShown = true;
+long lastLCDTime = 0;
+int oneSecond = 1000;
+
+long lastTimeMove = 0;
+
 void ReadFromEEPROM() {
   lcdBrightness = EEPROM.read(0);
   matrixBrightness = EEPROM.read(1);
@@ -158,12 +254,7 @@ void UpdateHighscores() {
   EEPROM.update(101, difficulty5);
 }
 
-bool firstPlace = false;
-bool secondPlace = false;
-bool thirdPlace = false;
-bool fourthPlace = false;
-bool fifthPlace = false;
-bool inGameOver2 = false;
+
 
 void CheckHighscore() {
   if (score > hScore1 || (score == hScore1 && difficulty > difficulty1)) {
@@ -287,77 +378,6 @@ void loop() {
   MatrixLoop();
   LCDLoop();
 }
-
-//Joystick Controller
-//Joystick pins
-const int xPin = A0;
-const int yPin = A1;
-const int pinSw = 2;
-
-const int minThreshold = 200;
-const int maxThreshold = 600;
-int xValue = 0;
-int yValue = 0;
-bool swState = HIGH;
-
-//debounce for joystick
-long lastTime = 0;
-long lastJoyTime = 0;
-int interval = 50;
-byte reading = LOW;
-byte joyState = LOW;
-byte lastReading = LOW;
-byte joyReading = LOW;
-byte lastJoyReading = HIGH;
-bool joyMoved = false;
-
-//matrix controller
-const int dinPin = 12;
-const int clockPin = 11;
-const int loadPin = 10;
-
-LedControl lc = LedControl(dinPin, clockPin, loadPin, 1);  // DIN, CLK, LOAD, No. DRIVER
-
-byte xPos = 0;
-byte yPos = 0;
-byte xLastPos = 0;
-byte yLastPos = 0;
-
-
-const byte matrixSize = 8;
-bool matrixChanged = true;
-
-byte matrix[matrixSize][matrixSize] = {
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0 }
-};
-
-//LCD pins
-const byte RS = 9;
-const byte enable = 8;
-const byte d4 = 7;
-const byte d5 = 6;
-const byte d6 = A5;
-const byte d7 = 4;
-const byte brightnessPin = 3;
-
-LiquidCrystal lcd(RS, enable, d4, d5, d6, d7);
-
-
-byte lcdCols = 16;
-byte lcdRows = 2;
-int maxBrightnessValue = 5;
-int minBrightnessValue = 1;
-int maxBrightnessValueRaw = 255;
-int minBrightnessValueRaw = 0;
-
-
 
 void CharactersSetup() {
   //arrows -> 1 up 2 down 3 left 4 right
@@ -579,9 +599,6 @@ void JoystickClickHandler() {
   lastReading = reading;
 }
 
-long lastMoved;
-int moveInterval = 100;
-
 void JoystickMovementHandler() {
   ///joystick movements
   xValue = analogRead(xPin);
@@ -625,8 +642,7 @@ void JoystickMovementHandler() {
   lastJoyReading = joyReading;
 }
 
-int rx = 3;
-int ry = 3;
+
 
 void GenerateRandomFood() {
   if (matrix[xPos][yPos] == 2) {
@@ -648,9 +664,6 @@ void GenerateRandomFood() {
   }
 }
 
-const short hardTime = 8;
-const short mediumTime = 10;
-const short easyTime = 12;
 
 int MaxTimeLeft() {
   if (difficulty == 1) {
@@ -1024,10 +1037,7 @@ void WriteMatrixBrightnessScreen() {
   lcd.print("5");
 }
 
-long int startedFlash = 0;
-short intervalBlink = 500;
-bool isPrinted = false;
-String charToPrint = "_";
+
 
 void LCDLoop() {
   if (inName == true) {
@@ -1116,13 +1126,6 @@ void MatrixSetup() {
   matrix[rx][ry] = 2;
 }
 
-long lastBlink = 0;
-int blinkTime = 200;
-bool isShown = true;
-long lastLCDTime = 0;
-int oneSecond = 1000;
-
-long lastTimeMove = 0;
 
 
 void MatrixLoop() {
