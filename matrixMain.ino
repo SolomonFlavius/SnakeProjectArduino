@@ -27,7 +27,7 @@ short minDifficulty = 1;
 short maxDifficulty = 3;
 short direction = 0;  //0 left 1 up 2 right 3 down
 short snakeRow[64];
-short snakeHeight[64];
+short snakeColumn[64];
 short snakeLength = 1;
 int speed = 200;
 int timeLeft;
@@ -660,7 +660,7 @@ void GenerateRandomFood() {
     }
     matrix[rx][ry] = 2;
   } else {
-    matrix[snakeRow[snakeLength]][snakeHeight[snakeLength]] = 0;
+    matrix[snakeRow[snakeLength]][snakeColumn[snakeLength]] = 0;
   }
 }
 
@@ -720,7 +720,7 @@ void JoystickClicked() {
       snakeLength = 1;
       timeLeft = MaxTimeLeft();
       snakeRow[1] = 0;
-      snakeHeight[1] = 0;
+      snakeColumn[1] = 0;
       WriteGameScreen();
     }
     if (menuOption == 1) {
@@ -1201,12 +1201,12 @@ void GameMoveUp() {
     GenerateRandomFood();
     for (int i = snakeLength; i >= 2; i--) {
       snakeRow[i] = snakeRow[i - 1];
-      snakeHeight[i] = snakeHeight[i - 1];
-      matrix[snakeRow[i]][snakeHeight[i]] = 1;
+      snakeColumn[i] = snakeColumn[i - 1];
+      matrix[snakeRow[i]][snakeColumn[i]] = 1;
     }
     matrix[xPos][yPos] = 1;
     snakeRow[1] = xPos;
-    snakeHeight[1] = yPos;
+    snakeColumn[1] = yPos;
   }
 }
 
@@ -1222,12 +1222,12 @@ void GameMoveDown() {
     GenerateRandomFood();
     for (int i = snakeLength; i >= 2; i--) {
       snakeRow[i] = snakeRow[i - 1];
-      snakeHeight[i] = snakeHeight[i - 1];
-      matrix[snakeRow[i]][snakeHeight[i]] = 1;
+      snakeColumn[i] = snakeColumn[i - 1];
+      matrix[snakeRow[i]][snakeColumn[i]] = 1;
     }
     matrix[xPos][yPos] = 1;
     snakeRow[1] = xPos;
-    snakeHeight[1] = yPos;
+    snakeColumn[1] = yPos;
   }
 }
 
@@ -1244,12 +1244,12 @@ void GameMoveLeft() {
     GenerateRandomFood();
     for (int i = snakeLength; i >= 2; i--) {
       snakeRow[i] = snakeRow[i - 1];
-      snakeHeight[i] = snakeHeight[i - 1];
-      matrix[snakeRow[i]][snakeHeight[i]] = 1;
+      snakeColumn[i] = snakeColumn[i - 1];
+      matrix[snakeRow[i]][snakeColumn[i]] = 1;
     }
     matrix[xPos][yPos] = 1;
     snakeRow[1] = xPos;
-    snakeHeight[1] = yPos;
+    snakeColumn[1] = yPos;
   }
 }
 
@@ -1266,12 +1266,12 @@ void GameMoveRight() {
     GenerateRandomFood();
     for (int i = snakeLength; i >= 2; i--) {
       snakeRow[i] = snakeRow[i - 1];
-      snakeHeight[i] = snakeHeight[i - 1];
-      matrix[snakeRow[i]][snakeHeight[i]] = 1;
+      snakeColumn[i] = snakeColumn[i - 1];
+      matrix[snakeRow[i]][snakeColumn[i]] = 1;
     }
     matrix[xPos][yPos] = 1;
     snakeRow[1] = xPos;
-    snakeHeight[1] = yPos;
+    snakeColumn[1] = yPos;
   }
 }
 
@@ -1289,7 +1289,7 @@ void GameOver() {
     snakeLength = 0;
     for (int i = 1; i <= 64; i++) {
       snakeRow[i] = 0;
-      snakeHeight[i] = 0;
+      snakeColumn[i] = 0;
     }
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
