@@ -1,6 +1,6 @@
 # SnakeProjectArduino
 ## Backstory
-I chose this type of game to ilustrate my Arduino skills.I started by connecting the 8x8 Matrix and then and LCD screen and a joystick.
+I chose this type of game to ilustrate my Arduino skills. I started by connecting the 8x8 Matrix and then and LCD screen and a joystick.
 At first I coded the menu selection and made a demo game with the "eating fruits" feature. After that I implemented other features like highscore or making the snake bigger.
 
 ## Game description
